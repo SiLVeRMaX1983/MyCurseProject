@@ -1,0 +1,55 @@
+<mat-card *ngFor="let habit of habits" class="habit-card">
+  <mat-card-header>
+    <mat-card-title>{{ habit.name }}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p *ngIf="habit.description">{{ habit.description }}</p>
+    
+    <div class="streak">Streak: {{ getStreak(habit.id) }} дней</div>
+
+   <!-- Недельный трекер -->
+<div class="section-title">Неделя</div>
+<div class="week-grid">
+  <div *ngFor="let day of getWeeklyProgress(habit.id)" 
+       class="day-cell"
+       [class.completed]="day.completed"
+       [class.today]="day.isToday"
+       [class.disabled]="!day.isPastOrToday"
+       (click)="day.isPastOrToday ? toggleDay(habit.id, day.date) : null">
+    <div class="day-number">{{ day.date.split('-')[2] }}</div>
+    <div class="day-name">{{ day.dayName }}</div>
+  </div>
+</div>
+
+    <!-- Месячный трекер -->
+    <div class="section-title">Месяц</div>
+    <div class="month-grid">
+      <!-- Заголовки дней недели -->
+      <div class="week-header">
+        <div>Вс</div>
+        <div>Пн</div>
+        <div>Вт</div>
+        <div>Ср</div>
+        <div>Чт</div>
+        <div>Пт</div>
+        <div>Сб</div>
+      </div>
+
+      <!-- Дни месяца -->
+      <div class="days-grid">
+        <div *ngFor="let cell of getMonthlyProgress(habit.id)"
+             class="month-day-cell"
+             [class.empty]="!cell.date"
+             [class.today]="cell.isToday"
+             [class.completed]="cell.completed"
+             [class.disabled]="!cell.isPast"
+             (click)="cell.date && cell.isPast ? toggleDay(habit.id, cell.date) : null">
+          <span *ngIf="cell.date">{{ cell.date.split('-')[2] }}</span>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-button color="warn" (click)="deleteHabit(habit.id)">Удалить</button>
+  </mat-card-actions>
+</mat-card>

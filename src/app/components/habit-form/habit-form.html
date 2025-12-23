@@ -1,0 +1,22 @@
+<form [formGroup]="habitForm" (ngSubmit)="onSubmit()" class="habit-form">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Название привычки</mat-label>
+    <input matInput formControlName="name" required>
+    <mat-error *ngIf="habitForm.get('name')?.hasError('required')">
+      Название обязательно
+    </mat-error>
+  </mat-form-field>
+  
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Описание</mat-label>
+    <input matInput formControlName="description">
+  </mat-form-field>
+  
+  <button 
+    mat-raised-button 
+    color="primary" 
+    type="submit" 
+    [disabled]="habitForm.invalid">
+    Добавить привычку
+  </button>
+</form>
