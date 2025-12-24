@@ -1,16 +1,27 @@
 import { TestBed } from '@angular/core/testing';
+import { CelebrationService } from './celebration';
 
-import { Celebration } from './celebration';
-
-describe('Celebration', () => {
-  let service: Celebration;
+describe('CelebrationService', () => {
+  let service: CelebrationService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(Celebration);
+    service = TestBed.inject(CelebrationService);
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
+  });
+
+  it('should emit messages', () => {
+    let message = '';
+    service.celebration$.subscribe((event) => {
+      message = event.message;
+    });
+
+    const testMessage = 'Great job!';
+    service.show(testMessage);
+
+    expect(message).toBe(testMessage);
   });
 });

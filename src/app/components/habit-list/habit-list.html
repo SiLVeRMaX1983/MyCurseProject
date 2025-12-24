@@ -1,7 +1,7 @@
 <mat-card *ngFor="let habit of habits" class="habit-card">
   <mat-card-header>
-    <mat-card-title>{{ habit.name }}</mat-card-title>
-  </mat-card-header>
+  <mat-card-title><strong>{{ habit.name }}</strong></mat-card-title>
+</mat-card-header>
   <mat-card-content>
     <p *ngIf="habit.description">{{ habit.description }}</p>
     
