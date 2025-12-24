@@ -4,4 +4,5 @@ export interface Habit {
   description?: string;
   completedDates: string[];
   createdAt: string;
+  streak?: number;
 }
