@@ -171,3 +171,103 @@
     opacity: 0.7;
   }
 }
+
+// 👈 НОВЫЕ СТИЛИ ДЛЯ ГРАФИКА
+.habit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chart-toggle-btn {
+  color: #888;
+  width: 40px;
+  height: 40px;
+  
+  &.active {
+    color: #4caf50 !important;
+    background: rgba(76, 175, 80, 0.2) !important;
+    transform: scale(1.1);
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.progress-section {
+  margin-top: 32px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 24px;
+  }
+}
+
+// 👈 ОБНОВИТЕ СТИЛИ ДЛЯ КОНТЕЙНЕРА
+.habits-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.habits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+// Существующие стили оставьте как есть
+.habit-card {
+  background: #f5f5f5;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+}
+
+.streak {
+  background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 14px;
+  display: inline-block;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin: 24px 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(76, 175, 80, 0.3);
+}
+

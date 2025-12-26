@@ -1,10 +1,31 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StorageService } from '../../services/storage';
-import { Habit } from '../../models/habit';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { Subscription } from 'rxjs';
+
+import { StorageService } from '../../services/storage';
+import { Habit } from '../../models/habit';
+import { WeeklyProgressChartComponent, WeekHistory } from '../weekly-progress-chart/weekly-progress-chart';
 import { CelebrationComponent } from '../celebration/celebration';
+
+interface WeekDay {
+  date: string;
+  dayName: string;
+  completed: boolean;
+  isPastOrToday: boolean;
+  isToday: boolean;
+}
+
+interface MonthCell {
+  date: string;
+  dayName: string;
+  completed: boolean;
+  isToday: boolean;
+  isPast: boolean;
+}
 
 @Component({
   selector: 'app-habit-list',
@@ -13,56 +34,84 @@ import { CelebrationComponent } from '../celebration/celebration';
     CommonModule,
     MatCardModule,
     MatButtonModule,
-    CelebrationComponent // 👈 импортируем standalone-компонент
+    MatIconModule,
+    MatTooltipModule,
+    WeeklyProgressChartComponent,
+    CelebrationComponent
   ],
   templateUrl: './habit-list.html',
   styleUrls: ['./habit-list.scss']
 })
-export class HabitList implements OnInit, AfterViewInit {
+export class HabitList implements OnInit, AfterViewInit, OnDestroy {
   habits: Habit[] = [];
+  selectedHabitId: string | null = null;
+
+  private sub?: Subscription;
 
   @ViewChild(CelebrationComponent) celebration!: CelebrationComponent;
 
-  constructor(private storageService: StorageService) {}
+  constructor(private storage: StorageService) {}
 
-  ngOnInit() {
-    // Подписываемся на обновления привычек
-    this.storageService.habits$.subscribe(habits => {
+  ngOnInit(): void {
+    this.sub = this.storage.habits$.subscribe(habits => {
       this.habits = habits;
-      // Проверяем streak для каждой привычки (на случай загрузки или внешнего изменения)
-      this.habits.forEach(habit => {
-        const streak = this.getStreak(habit.id);
-        if (habit.streak !== streak) {
-          // Обновляем в модели (если нужно)
-          habit.streak = streak;
-          this.checkStreakAndCelebrate(habit);
-        }
-      });
+      this.updateStreaks();
     });
   }
 
-  ngAfterViewInit(): void {
-    // Гарантируем, что ViewChild готов
+  ngAfterViewInit(): void {}
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+  }
+
+  get selectedHabitName(): string {
+    if (!this.selectedHabitId) return '';
+    const habit = this.habits.find(h => h.id === this.selectedHabitId);
+    return habit ? habit.name : '';
+  }
+
+  private updateStreaks(): void {
+    this.habits.forEach(habit => {
+      habit.streak = this.storage.getStreak(habit.id);
+    });
   }
 
   deleteHabit(id: string): void {
-    this.storageService.deleteHabit(id);
+    this.storage.deleteHabit(id);
+    if (this.selectedHabitId === id) {
+      this.selectedHabitId = null;
+    }
+  }
+
+  selectHabit(habitId: string): void {
+    this.selectedHabitId = habitId;
+  }
+
+  closeChart(): void {
+    this.selectedHabitId = null;
   }
 
   getStreak(habitId: string): number {
-    return this.storageService.getStreak(habitId);
+    return this.storage.getStreak(habitId);
   }
 
-  getWeeklyProgress(habitId: string) {
-    return this.storageService.getWeeklyProgress(habitId);
+  getWeeklyProgress(habitId: string): WeekDay[] {
+    return this.storage.getWeeklyProgress(habitId) as WeekDay[];
   }
 
-  getMonthlyProgress(habitId: string) {
-    return this.storageService.getMonthlyProgress(habitId);
+  getMonthlyProgress(habitId: string): MonthCell[] {
+    return this.storage.getMonthlyProgress(habitId) as MonthCell[];
+  }
+
+  getWeeklyHistoricalData(habitId: string): WeekHistory[] {
+    return this.storage.getHistoricalWeeklyProgress(habitId);
   }
 
   toggleDay(habitId: string, date: string): void {
-    this.storageService.toggleHabitDate(habitId, date);
+    if (!date) return;
+
+    this.storage.toggleHabitDate(habitId, date);
 
     // После toggle — проверим streak конкретной привычки
     const streak = this.getStreak(habitId);
@@ -73,8 +122,8 @@ export class HabitList implements OnInit, AfterViewInit {
     }
   }
 
-  checkStreakAndCelebrate(habit: Habit) {
-    const streak = habit.streak;
+  private checkStreakAndCelebrate(habit: Habit): void {
+    const streak = habit.streak ?? 0;
     let message = '';
 
     if (streak === 5) {
@@ -87,7 +136,7 @@ export class HabitList implements OnInit, AfterViewInit {
       message = '🏆 БОГ ПРИВЫЧЕК! 30 дней — ты легенда!';
     }
 
-    if (message) {
+    if (message && this.celebration) {
       this.celebration.message = message;
       this.celebration.show();
     }

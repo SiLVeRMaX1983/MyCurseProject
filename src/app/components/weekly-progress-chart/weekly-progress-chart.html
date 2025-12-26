@@ -1,0 +1,16 @@
+<div class="chart-container" *ngIf="weeklyData.length > 0">
+  <canvas baseChart
+          [data]="chartData"
+          [options]="chartOptions"
+          [type]="chartType">
+  </canvas>
+
+  <div class="chart-stats">
+    <div>Текущая неделя: {{ currentWeekProgress }}%</div>
+    <div>Средний прогресс: {{ avgProgress }}%</div>
+  </div>
+</div>
+
+<p *ngIf="weeklyData.length === 0" class="no-data">
+  Недостаточно данных для графика
+</p>

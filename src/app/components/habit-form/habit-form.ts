@@ -35,7 +35,7 @@ export class HabitForm {
   onSubmit() {
     if (this.habitForm.valid) {
       this.storageService.addHabit(this.habitForm.value);
-      this.habitForm.reset();
+      this.habitForm.reset({ name: '', description: '' });
     }
   }
 }

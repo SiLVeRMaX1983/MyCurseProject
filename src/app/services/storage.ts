@@ -141,6 +141,43 @@ export class StorageService {
   return week;
 }
 
+
+getHistoricalWeeklyProgress(habitId: string, weeksBack = 4): { weekLabel: string; completed: number; total: number }[] {
+  const habit = this.habitsSubject.value.find(h => h.id === habitId);
+  if (!habit) return [];
+
+  const completedSet = new Set(habit.completedDates);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const weeks: { weekLabel: string; completed: number; total: number }[] = [];
+
+  for (let w = weeksBack - 1; w >= 0; w--) {
+    const weekStart = new Date(today);
+    const daysSinceMonday = (today.getDay() + 6) % 7;
+    weekStart.setDate(today.getDate() - daysSinceMonday - w * 7);
+    weekStart.setHours(0, 0, 0, 0);
+
+    let completedCount = 0;
+    const daysInWeek = 7;
+
+    for (let d = 0; d < daysInWeek; d++) {
+      const date = new Date(weekStart);
+      date.setDate(weekStart.getDate() + d);
+      const dateStr = this.toLocalDateStr(date);
+
+      if (date <= today && completedSet.has(dateStr)) {
+        completedCount++;
+      }
+    }
+
+    const label = `${weekStart.getDate()}.${weekStart.getMonth() + 1}`;
+    weeks.push({ weekLabel: label, completed: completedCount, total: daysInWeek });
+  }
+
+  return weeks;
+}
+
 getMonthlyProgress(habitId: string): { date: string; dayName: string; completed: boolean; isToday: boolean; isPast: boolean }[] {
   const habit = this.habitsSubject.value.find(h => h.id === habitId);
   if (!habit) return [];

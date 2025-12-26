@@ -15,10 +15,8 @@ describe('StorageService', () => {
   it('should add a new habit with correct structure', () => {
     // Проверяем что пусто
     expect(service['habitsSubject'].value.length).toBe(0);
-
     // Добавляем привычку
     service.addHabit({ name: 'Пробежка', description: 'Утро' });
-
     // Проверяем результат
     const habits = service['habitsSubject'].value;
     expect(habits.length).toBe(1);  //  Было 2 стало 1
@@ -34,11 +32,9 @@ describe('StorageService', () => {
     service.addHabit({ name: 'Тест', description: 'Тест описание' });
     const habitId = service['habitsSubject'].value[0].id;
     const testDate = '2025-12-24';
-
     //  Добавляем дату
     service.toggleHabitDate(habitId, testDate);
     expect(service['habitsSubject'].value[0].completedDates).toContain(testDate);
-
     //  Удаляем дату
     service.toggleHabitDate(habitId, testDate);
     expect(service['habitsSubject'].value[0].completedDates).not.toContain(testDate);
